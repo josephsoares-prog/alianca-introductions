@@ -167,7 +167,7 @@ html[lang="fr"] span[data-fr],html[lang="fr"] b[data-fr]{display:inline}
     ["ref","utm_source","utm_medium","utm_campaign","utm_content","utm_term"].forEach(function(k){d[k]=q.get(k)||""});
     d.lang=html.getAttribute("lang");d.page_url=location.href;d.referrer=document.referrer;d.form_type="alianca_application";d.submitted_at=new Date().toISOString();
     fetch(HOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)})
-      .then(function(){f.style.display="none";document.getElementById("done").style.display="block";window.scrollTo(0,document.getElementById("done").offsetTop-40)})
+      .then(function(){track("application_submitted",{campaign_ref:REF,age_band:d.age_band,income_band:d.income_band,timeline:d.timeline});f.style.display="none";document.getElementById("done").style.display="block";window.scrollTo(0,document.getElementById("done").offsetTop-40)})
       .catch(function(){b.disabled=false;alert("The application could not be sent. Please try again.")});
   });
 })();
