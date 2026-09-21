@@ -146,7 +146,19 @@ html[lang="fr"] span[data-fr],html[lang="fr"] b[data-fr]{display:inline}
   setLang(q.get("lang")||saved||((navigator.language||"").toLowerCase().indexOf("fr")===0?"fr":"en"));
   document.getElementById("en").onclick=function(e){e.preventDefault();setLang("en")};
   document.getElementById("fr").onclick=function(e){e.preventDefault();setLang("fr")};
-  var f=document.getElementById("app");
+  // Measurement. Fill in the IDs when the properties exist; nothing loads while they are empty.
+  var GA_ID="";        // GA4 Measurement ID, e.g. G-XXXXXXXXXX (separate property for this brand)
+  var CF_TOKEN="";     // Cloudflare Web Analytics token
+  var REF=q.get("ref")||q.get("utm_source")||"direct";
+  function track(ev,params){try{if(window.gtag){gtag("event",ev,params||{})}}catch(e){}}
+  if(GA_ID){var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id="+GA_ID;document.head.appendChild(s);
+    window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());
+    gtag("set","user_properties",{campaign_ref:REF});gtag("config",GA_ID,{anonymize_ip:true,campaign_ref:REF,lang:html.getAttribute("lang")});}
+  if(CF_TOKEN){var c=document.createElement("script");c.defer=true;c.src="https://static.cloudflareinsights.com/beacon.min.js";c.setAttribute("data-cf-beacon",JSON.stringify({token:CF_TOKEN}));document.head.appendChild(c);}
+  var f=document.getElementById("app"), started=false;
+  f.addEventListener("focusin",function(){if(!started){started=true;track("application_started",{campaign_ref:REF})}});
+  var applyH=document.querySelector("[data-en] h2:last-of-type");
+  if(applyH&&"IntersectionObserver" in window){new IntersectionObserver(function(en,o){if(en[0].isIntersecting){track("reached_apply",{campaign_ref:REF});o.disconnect()}}).observe(applyH)}
   f.addEventListener("submit",function(e){
     e.preventDefault();
     if(!f.checkValidity()){f.reportValidity();return}
